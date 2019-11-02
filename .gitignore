@@ -1,0 +1,5 @@
+.vscode
+config/
+!config/basic.cfg
+!config.server.cfg
+!config/Users/serverProfile/serverProfile.Arma3Profile
