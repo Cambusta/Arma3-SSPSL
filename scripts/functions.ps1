@@ -217,15 +217,26 @@ function Prompt-PresetSelection()
     return $selectedPreset
 }
 
-function Propmpt-OpenRpt()
+function Prompt-ExitAction()
 {
-    Write-Host "Press [Enter] to open the RPT file." -NoNewline
-    $input = Read-Host
+    $done = $false
 
-    if ($input -eq "")
-    {
-        Open-LatestRpt
-    }
+    do {
+        Write-Host "Press [Enter] to exit or [R] to open RPT file: " -NoNewline
+        $input = Read-Host
+    
+        if ($input.ToString().ToLower() -eq "r")
+        {
+            Open-LatestRpt
+            $done = $true
+        }
+
+        if ($input -eq "")
+        {
+            $done = $true
+        }
+
+    } until ($done)
 }
 
 function Read-PresetFile()

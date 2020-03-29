@@ -70,7 +70,7 @@ function Launch()
     Write-Host
     Start-Server -ModsParameter $modsParameter
 
-    Propmpt-OpenRpt
+    Prompt-ExitAction
 
     Write-Host
     Write-Host "Exiting." -ForegroundColor Black -BackgroundColor DarkGray
