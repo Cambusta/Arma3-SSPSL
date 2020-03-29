@@ -99,7 +99,9 @@ function Compile-ModsParameter()
         if (Test-Path (Join-Path $a3RootPath $relativePath))
         {
             Write-Host "$mod" -ForegroundColor Green
-            $parameter = $parameter + "!Workshop\@$mod;"
+
+            $modFolder = Get-SymlinkTarget -SymlinkPath $relativePath
+            $parameter = $parameter + "$modFolder;"
         }
         else 
         {
@@ -110,6 +112,23 @@ function Compile-ModsParameter()
     $parameter = $parameter + '"'
 
     return $parameter
+}
+
+function Get-SymlinkTarget()
+{
+    param(
+        [Parameter(Mandatory=$true)]
+        $SymlinkPath
+    )
+
+    $targetPath = Get-Item (Join-Path $a3RootPath $SymlinkPath) | Select-Object -ExpandProperty Target
+
+    if (!(Test-Path $targetPath))
+    {
+        throw "Error while expanding symlink '$SymlinkPath': target path '$targetPath' doesn't exist."
+    }
+
+    return $targetPath
 }
 
 function Read-Presets()
@@ -198,6 +217,17 @@ function Prompt-PresetSelection()
     return $selectedPreset
 }
 
+function Propmpt-OpenRpt()
+{
+    Write-Host "Press [Enter] to open the RPT file." -NoNewline
+    $input = Read-Host
+
+    if ($input -eq "")
+    {
+        Open-LatestRpt
+    }
+}
+
 function Read-PresetFile()
 {
     param(
@@ -229,4 +259,34 @@ function Read-PresetFile()
     Write-Host "Read $($mods.Count) mods, $skipped skipped."
 
     return $mods
+}
+
+function Open-LatestRpt()
+{
+    $rptFilesLocation = $profileConfigPath
+
+    $latestRptFile = Get-ChildItem $rptFilesLocation -Filter "*.rpt" `
+                        | Sort-Object LastWriteTime -Descending `
+                        | Select-Object -First 1
+
+    Write-Host "Opening $($latestRptFile.FullName)"
+
+    Invoke-Item $($latestRptFile.FullName)
+}
+
+function Test-ServerRunning()
+{
+    $serverProcesses = @($arma3server64ProcessName, $arma3serverProcessName)
+
+    foreach($p in $serverProcesses)
+    {
+        $process = Get-Process $p -ErrorAction SilentlyContinue
+
+        if ($process)
+        {
+            return $true
+        }
+    }
+
+    return $false
 }

@@ -16,11 +16,19 @@ $basicConfigPath = "..\config\basic.cfg"
 $profileConfigPath = "..\config\Users\serverProfile\"
 $port = 2302
 
+$arma3server64ProcessName = "arma3server_x64"
+$arma3serverProcessName = "arma3server"
+
 # Include utility functions
 . '.\functions.ps1'
 
 function Launch()
 {
+    if (Test-ServerRunning)
+    {
+        Write-Host "Another server instance is already running." -BackgroundColor Yellow -ForegroundColor Black
+    }
+
     Write-Host
     Write-Host "Reading presets..."
     
@@ -57,6 +65,11 @@ function Launch()
     
     Write-Host
     Start-Server -ModsParameter $modsParameter
+
+    Propmpt-OpenRpt
+
+    Write-Host
+    Write-Host "Exiting." -ForegroundColor Black -BackgroundColor DarkGray
 }
 
 try {
