@@ -1,3 +1,3 @@
 echo off
 cd .\scripts\
-powershell -noexit "& '.\launch.ps1'"
+powershell "& '.\launch.ps1'"

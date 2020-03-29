@@ -8,10 +8,13 @@ param(
 
 $ErrorActionPreference = "Stop"
 
-$a3RootPath = 'D:\SteamLibrary\steamapps\common\Arma 3\'
+# Global variables
+$launcherParametersFile = "..\parameters.json"
+
+$a3RootPath = 'C:\Program Files (x86)\Steam\steamapps\common\Arma 3\'
+$serverExeName = "arma3server_x64.exe"
 $port = 2302
 
-$serverExePath = Join-Path $a3RootPath 'arma3server_x64.exe'
 $presetsFolder = "..\presets\"
 $serverConfigPath = "..\config\server.cfg"
 $basicConfigPath = "..\config\basic.cfg"
@@ -27,6 +30,12 @@ $arma3serverProcessName = "arma3server"
 function Launch()
 {
     $host.ui.RawUI.WindowTitle = "Arma 3 Simple PowerShell Launcher"
+
+    $parameters = Read-LauncherParametersFile $launcherParametersFile
+
+    $a3RootPath = $parameters.Arma3RootPath
+    $serverExeName = $parameters.ServerExeName
+    $port = $parameters.Port
 
     if (Test-ServerRunning)
     {
@@ -50,15 +59,15 @@ function Launch()
     }
     else
     {
-        Print-Presets $presets
+        Write-Presets $presets
 
         Write-Host
-        $preset = Prompt-PresetSelection $presets
+        $preset = Read-SelectedPreset $presets
     }
     
     Write-Host
     $mods = Read-PresetFile $($preset.Path)
-    $modsParameter = Compile-ModsParameter -ModNames $mods
+    $modsParameter = Initialize-ModsParameter -ModNames $mods
     
     if ($NoKeyCopying -ne $true)
     {
@@ -70,17 +79,21 @@ function Launch()
     Write-Host
     Start-Server -ModsParameter $modsParameter
 
-    Prompt-ExitAction
+    Read-ExitAction
 
     Write-Host
     Write-Host "Exiting." -ForegroundColor Black -BackgroundColor DarkGray
+    exit
 }
 
 try {
     Launch
 }
 catch {
-    Write-Host "An error has occured" -ForegroundColor White -BackgroundColor Red
-    Write-Host "$($_.Exception.GetType().FullName): " -ForegroundColor White -BackgroundColor Red -NoNewline
-    Write-Host $_.Exception.Message
+    Write-Host "An error has occured" -ForegroundColor White -BackgroundColor Red -NoNewline
+    Write-Host " $($_.Exception.Message)"
+
+    Write-Host
+    Write-Host "Press any key to exit."
+    [console]::ReadKey()
 }

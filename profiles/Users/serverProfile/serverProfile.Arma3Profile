@@ -34,3 +34,4 @@ class DifficultyPresets
 		precisionAI=0.44999999;
 	};
 };
+viewDistance=2500;

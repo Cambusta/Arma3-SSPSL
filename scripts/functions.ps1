@@ -8,6 +8,7 @@ function Start-Server()
     $serverNameParameter = "-name=$profileName"
     $portParameter = "-port=$port"
 
+    $serverExePath = Join-Path $a3RootPath $serverExeName
     $serverConfigParameter = '"-config=' + $(Resolve-Path $serverConfigPath) + '"'
     $basicConfigParameter = '"-cfg=' + $(Resolve-Path $basicConfigPath) +'"'
     $profilesParameter = '"-profiles=' + $(Resolve-Path $profilesPath) + '"'
@@ -15,12 +16,42 @@ function Start-Server()
     Write-Host "Starting server at $port..."
 
     $argumentList = @($serverNameParameter, $portParameter, $basicConfigParameter, $serverConfigParameter, $profilesParameter, $ModsParameter)
-    Start-Process -FilePath $ServerExePath -ArgumentList $argumentList
+    Start-Process -FilePath $serverExePath -ArgumentList $argumentList
 
     Write-Host "Server started." -ForegroundColor Black -BackgroundColor Green
     Write-Host
 }
 
+function Read-LauncherParametersFile {
+    param (
+        [Parameter(Mandatory=$true)]
+        $FilePath
+    )
+    
+    if (!(Test-Path $FilePath))
+    {
+        throw "Expected launcher parameters file at $FilePath, but none found."
+    }
+
+    $parameters = ConvertFrom-Json $(Get-Content $FilePath -Raw)
+
+    if (!($parameters.Arma3RootPath) -or !(Test-Path $parameters.Arma3RootPath))
+    {
+        throw "Launcher parameters: Arma3RootPath not set or invalid."
+    }
+
+    if (!($parameters.ServerExeName) -or !(Test-Path $(Join-Path $parameters.Arma3RootPath $parameters.ServerExeName)))
+    {
+        throw "Launcher parameters: ServerExeName not set or invalid."
+    }
+
+    if (!($parameters.Port) -or ($parameters.Port -isnot [int]))
+    {
+        throw "Launcher parameters: Port value not set or invalid."
+    }
+
+    return $parameters
+}
 function Clear-KeysFolder()
 {
     Write-Host "Purging keys folder..."
@@ -83,7 +114,7 @@ function Copy-Keys()
     }
 }
 
-function Compile-ModsParameter()
+function Initialize-ModsParameter()
 {
     param(
         [Parameter(Mandatory=$true)]
@@ -157,7 +188,7 @@ function Read-Presets()
     return $presets
 }
 
-function Print-Presets()
+function Write-Presets()
 {
     param(
         [Parameter(Mandatory=$true)]
@@ -170,7 +201,7 @@ function Print-Presets()
     }
 }
 
-function Prompt-PresetSelection()
+function Read-SelectedPreset()
 {
     param(
         [Parameter(Mandatory=$true)]
@@ -217,24 +248,26 @@ function Prompt-PresetSelection()
     return $selectedPreset
 }
 
-function Prompt-ExitAction()
+function Read-ExitAction()
 {
     $done = $false
 
     do {
         Write-Host "Press [Enter] to exit or [R] to open RPT file: " -NoNewline
-        $input = Read-Host
+        $input = [console]::ReadKey()
     
-        if ($input.ToString().ToLower() -eq "r")
+        if ($input.Key -eq 'R')
         {
             Open-LatestRpt
             $done = $true
         }
 
-        if ($input -eq "")
+        if ($input.Key -eq "Enter")
         {
             $done = $true
         }
+
+        Write-Host
 
     } until ($done)
 }
