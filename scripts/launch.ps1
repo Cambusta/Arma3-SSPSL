@@ -9,12 +9,14 @@ param(
 $ErrorActionPreference = "Stop"
 
 $a3RootPath = 'D:\SteamLibrary\steamapps\common\Arma 3\'
+$port = 2302
+
 $serverExePath = Join-Path $a3RootPath 'arma3server_x64.exe'
 $presetsFolder = "..\presets\"
 $serverConfigPath = "..\config\server.cfg"
 $basicConfigPath = "..\config\basic.cfg"
-$profileConfigPath = "..\config\Users\serverProfile\"
-$port = 2302
+$profileName = "serverProfile"
+$profilesPath = "..\profiles\"
 
 $arma3server64ProcessName = "arma3server_x64"
 $arma3serverProcessName = "arma3server"
@@ -24,6 +26,8 @@ $arma3serverProcessName = "arma3server"
 
 function Launch()
 {
+    $host.ui.RawUI.WindowTitle = "Arma 3 Simple PowerShell Launcher"
+
     if (Test-ServerRunning)
     {
         Write-Host "Another server instance is already running." -BackgroundColor Yellow -ForegroundColor Black

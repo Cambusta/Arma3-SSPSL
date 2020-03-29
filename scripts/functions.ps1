@@ -5,12 +5,12 @@ function Start-Server()
         $ModsParameter
     )
 
-    $serverNameParameter = "-name=serverProfile"
+    $serverNameParameter = "-name=$profileName"
     $portParameter = "-port=$port"
 
     $serverConfigParameter = '"-config=' + $(Resolve-Path $serverConfigPath) + '"'
     $basicConfigParameter = '"-cfg=' + $(Resolve-Path $basicConfigPath) +'"'
-    $profilesParameter = '"-profiles=' + $(Resolve-Path $profileConfigPath) + '"'
+    $profilesParameter = '"-profiles=' + $(Resolve-Path $profilesPath) + '"'
 
     Write-Host "Starting server at $port..."
 
@@ -263,9 +263,7 @@ function Read-PresetFile()
 
 function Open-LatestRpt()
 {
-    $rptFilesLocation = $profileConfigPath
-
-    $latestRptFile = Get-ChildItem $rptFilesLocation -Filter "*.rpt" `
+    $latestRptFile = Get-ChildItem $profilesPath -Filter "*.rpt" `
                         | Sort-Object LastWriteTime -Descending `
                         | Select-Object -First 1
 
