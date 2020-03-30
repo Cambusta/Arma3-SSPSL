@@ -30,8 +30,9 @@ class DifficultyPresets
 	};
 	class CustomAILevel
 	{
-		skillAI=1;
+		skillAI=0.65;
 		precisionAI=0.44999999;
 	};
 };
-viewDistance=2500;
+viewDistance=2000;
+preferredObjectViewDistance=800;

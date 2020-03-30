@@ -29,7 +29,7 @@ $arma3serverProcessName = "arma3server"
 
 function Launch()
 {
-    $host.ui.RawUI.WindowTitle = "Arma 3 Simple PowerShell Launcher"
+    $host.ui.RawUI.WindowTitle = "Arma 3 Server Simple PowerShell Launcher"
 
     $parameters = Read-LauncherParametersFile $launcherParametersFile
 

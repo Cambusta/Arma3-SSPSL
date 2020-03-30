@@ -19,6 +19,8 @@ See [server.cfg description](https://community.bistudio.com/wiki/server.cfg) for
 ## Server Difficulty Configuration
 Server difficulty settings can be configured by editing the `.\profiles\Users\serverProfile\serverProfile.Arma3Profile` file. See [server.armaprofile](https://community.bistudio.com/wiki/server.armaprofile) description for details.
 
+View Distance and Object View Distance parameters are also configured in this file. The default values are `viewDistance=1000;` and `preferredObjectViewDistance=800;` respectively.
+
 ## Running the tool
 Simply run `start.cmd` file. 
 
