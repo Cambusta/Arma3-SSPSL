@@ -37,7 +37,7 @@ function Launch()
     $serverExeName = $parameters.ServerExeName
     $port = $parameters.Port
 
-    if (Test-ServerRunning)
+    if (!(Confirm-ServerNotRunning))
     {
         Write-Host "Another server instance is already running." -BackgroundColor Yellow -ForegroundColor Black
     }
@@ -46,7 +46,7 @@ function Launch()
     Write-Host "Reading presets..."
     
     Write-Host
-    $presets = Read-Presets
+    $presets = Get-PresetFiles
 
     if ($PresetFileName)
     {
@@ -59,7 +59,7 @@ function Launch()
     }
     else
     {
-        Write-Presets $presets
+        Write-PresetList $presets
 
         Write-Host
         $preset = Read-SelectedPreset $presets
@@ -67,17 +67,18 @@ function Launch()
     
     Write-Host
     $mods = Read-PresetFile $($preset.Path)
-    $modsParameter = Initialize-ModsParameter -ModNames $mods
+    $modParameter = Initialize-GlobalModParameter -ModNames $mods.global
+    $serverModParameter = Initialize-ServerModParameter -ModNames $mods.server
     
     if ($NoKeyCopying -ne $true)
     {
         Write-Host
         Clear-KeysFolder
-        Copy-Keys -ModNames $mods
+        Copy-Keys -ModNames $($mods.global + $mods.server)
     }
     
     Write-Host
-    Start-Server -ModsParameter $modsParameter
+    Start-Server -ModParameter $modParameter -ServerModParameter $serverModParameter
 
     Read-ExitAction
 

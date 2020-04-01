@@ -1,8 +1,8 @@
 function Start-Server()
 {
     param(
-        [Parameter(Mandatory=$true)]
-        $ModsParameter
+        $ModParameter,
+        $ServerModParameter
     )
 
     $serverNameParameter = "-name=$profileName"
@@ -15,7 +15,18 @@ function Start-Server()
 
     Write-Host "Starting server at $port..."
 
-    $argumentList = @($serverNameParameter, $portParameter, $basicConfigParameter, $serverConfigParameter, $profilesParameter, $ModsParameter)
+    $argumentList = @($serverNameParameter, $portParameter, $basicConfigParameter, $serverConfigParameter, $profilesParameter)
+
+    if ($ModParameter)
+    {
+        $argumentList += $ModParameter
+    }
+
+    if ($ServerModParameter)
+    {
+        $argumentList += $ServerModParameter
+    }
+
     Start-Process -FilePath $serverExePath -ArgumentList $argumentList
 
     Write-Host "Server started." -ForegroundColor Black -BackgroundColor Green
@@ -114,25 +125,68 @@ function Copy-Keys()
     }
 }
 
-function Initialize-ModsParameter()
+function Initialize-GlobalModParameter()
 {
     param(
         [Parameter(Mandatory=$true)]
         $ModNames
     )
 
-    $parameter = '"-mod='
+    if ($ModNames)
+    {
+        $modPaths = Initialize-ModList $ModNames
+        return "-mod=$modPaths"
+    }
 
-    foreach($mod in $mods)
+    return $null
+}
+
+function Initialize-ServerModParameter()
+{
+    param(
+        [Parameter(Mandatory=$true)]
+        $ModNames
+    )
+
+    if ($ModNames)
+    {
+        $modPaths = Initialize-ModList $ModNames -ServerMods
+        return "-servermod=$modPaths"
+    }
+
+    return $null
+}
+
+function Initialize-ModList
+{
+    param(
+        [Parameter(Mandatory=$true)]
+        $ModNames,
+
+        [Switch]
+        $ServerMods
+    )
+
+    $modlist = '"'
+
+    foreach($mod in $ModNames)
     {
         $relativePath = "!Workshop\@$mod"
 
         if (Test-Path (Join-Path $a3RootPath $relativePath))
         {
-            Write-Host "$mod" -ForegroundColor Green
 
-            $modFolder = Get-SymlinkTarget -SymlinkPath $relativePath
-            $parameter = $parameter + "$modFolder;"
+            if ($ServerMods)
+            {
+                Write-Host "$mod (server-side)" -ForegroundColor DarkGreen
+            }
+            else 
+            {
+                Write-Host "$mod" -ForegroundColor Green
+            }
+
+            $modPath = Get-SymlinkTarget -SymlinkPath $relativePath
+            $modlist = $modlist + "$modPath;"
         }
         else 
         {
@@ -140,9 +194,9 @@ function Initialize-ModsParameter()
         }
     }
 
-    $parameter = $parameter + '"'
+    $modlist = $modlist + '"'
 
-    return $parameter
+    return $modlist
 }
 
 function Get-SymlinkTarget()
@@ -162,7 +216,7 @@ function Get-SymlinkTarget()
     return $targetPath
 }
 
-function Read-Presets()
+function Get-PresetFiles()
 {
     $index = 1;
     $presets = @()
@@ -188,7 +242,7 @@ function Read-Presets()
     return $presets
 }
 
-function Write-Presets()
+function Write-PresetList()
 {
     param(
         [Parameter(Mandatory=$true)]
@@ -258,7 +312,7 @@ function Read-ExitAction()
     
         if ($input.Key -eq 'R')
         {
-            Open-LatestRpt
+            Open-LatestRptFile
             $done = $true
         }
 
@@ -280,7 +334,12 @@ function Read-PresetFile()
     )
 
     $skipped = 0
-    $mods = @()
+
+    $mods = @{
+        global = @()
+        server = @()
+    }
+
     $content = Get-Content -Path $Modfile
 
     foreach ($line in $content)
@@ -290,22 +349,29 @@ function Read-PresetFile()
             continue
         }
 
-        if ($line[0] -ne '#')
+        if ($line[0] -eq '#')
         {
-            $mods += @($line)
+            $skipped++
+            continue
+        }
+
+        if ($line[0] -eq '$')
+        {
+            $name = $line.substring(1)
+            $mods.server += $name.Trim()
         }
         else
         {
-            $skipped++
+            $mods.global += $line.Trim()
         }
     }
 
-    Write-Host "Read $($mods.Count) mods, $skipped skipped."
+    Write-Host "Read $($mods.global.Count) global mods, $($mods.server.Count) server mods, $skipped skipped."
 
     return $mods
 }
 
-function Open-LatestRpt()
+function Open-LatestRptFile()
 {
     $latestRptFile = Get-ChildItem $profilesPath -Filter "*.rpt" `
                         | Sort-Object LastWriteTime -Descending `
@@ -316,7 +382,7 @@ function Open-LatestRpt()
     Invoke-Item $($latestRptFile.FullName)
 }
 
-function Test-ServerRunning()
+function Confirm-ServerNotRunning()
 {
     $serverProcesses = @($arma3server64ProcessName, $arma3serverProcessName)
 
@@ -326,9 +392,9 @@ function Test-ServerRunning()
 
         if ($process)
         {
-            return $true
+            return $false
         }
     }
 
-    return $false
+    return $true
 }
