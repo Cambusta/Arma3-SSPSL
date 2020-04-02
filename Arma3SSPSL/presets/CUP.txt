@@ -7,4 +7,5 @@ CUP Units
 CUP Vehicles
 CUP Weapons
 
-#RHSAFRF
+$ dzn Vehicle On Fire
+# RHSAFRF

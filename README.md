@@ -34,7 +34,7 @@ Simply run `start.cmd` file.
 Alternatively, if you want to make use of `-PresetName` and `-NoKeyCopying` parameters, run `.\scripts\launch.ps1` file.
 
 ## Presets
-Presets are simple text files placed into `.\presets\` folder. Presets contain names of the mods from Arma 3's `!Workshop` folder, without the `@` sign. Only one mod per line is allowed. For convenience, individual mods can be disabled from loading by putting the `#` sign in front of their names.
+Presets are simple text files placed into `.\presets\` folder. Presets contain names of the mods from Arma 3's `!Workshop` folder, without the `@` sign. Only one mod per line is allowed, empty lines are ignored. Use `$` at the beginning of a line to indicate that a mod is server-side and `#` for comments or disabling mods.
 
 See `.\presets\CUP.txt` for an example of a preset.
 

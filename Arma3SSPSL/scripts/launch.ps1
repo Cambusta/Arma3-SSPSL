@@ -11,16 +11,19 @@ $ErrorActionPreference = "Stop"
 # Global variables
 $launcherParametersFile = "..\parameters.json"
 
+# Default global values, overriden by user in parameters.json file
 $a3RootPath = 'C:\Program Files (x86)\Steam\steamapps\common\Arma 3\'
 $serverExeName = "arma3server_x64.exe"
 $port = 2302
 
+# Relative paths to server config files
 $presetsFolder = "..\presets\"
 $serverConfigPath = "..\config\server.cfg"
 $basicConfigPath = "..\config\basic.cfg"
 $profileName = "serverProfile"
 $profilesPath = "..\profiles\"
 
+# Arma 3 Server process names
 $arma3server64ProcessName = "arma3server_x64"
 $arma3serverProcessName = "arma3server"
 
@@ -29,13 +32,13 @@ $arma3serverProcessName = "arma3server"
 
 function Launch()
 {
-    $host.ui.RawUI.WindowTitle = "Arma 3 Server Simple PowerShell Launcher"
+    Set-WindowTitle
 
-    $parameters = Read-LauncherParametersFile $launcherParametersFile
+    $launcherParameters = Read-LauncherParametersFile $launcherParametersFile
 
-    $a3RootPath = $parameters.Arma3RootPath
-    $serverExeName = $parameters.ServerExeName
-    $port = $parameters.Port
+    $a3RootPath = $launcherParameters.Arma3RootPath
+    $serverExeName = $launcherParameters.ServerExeName
+    $port = $launcherParameters.Port
 
     if (!(Confirm-ServerNotRunning))
     {
@@ -50,19 +53,14 @@ function Launch()
 
     if ($PresetFileName)
     {
-        $preset = $presets | Where-Object { $_.Name -eq $PresetFileName }
-
-        if ($null -eq $preset)
-        {
-            throw "Invalid preset name '$PresetFileName'"
-        }
+        $preset = Select-PresetByName -PresetList $presets -PresetName $PresetFileName
     }
     else
     {
         Write-PresetList $presets
 
         Write-Host
-        $preset = Read-SelectedPreset $presets
+        $preset = Select-PresetByIndex $presets
     }
     
     Write-Host
