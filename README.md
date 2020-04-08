@@ -6,6 +6,10 @@ This is a simple tool that helps to start an Arma 3 Dedicated server and manage 
 
 SSPSL comes complete with configuration files so running a dedicated server is as simple as downloading the tool, adjusting few values in two files and double-clicking the `start.cmd`.
 
+## Installation
+1. Click "Clone or download" button at the top right corner to download this repository as a ZIP archive.
+2. Unarchive `Arma3SSPSL` folder to location of your choice.
+
 ## Сonfiguration
 The basic configuration requires updating several values in the following configuration files:
 
