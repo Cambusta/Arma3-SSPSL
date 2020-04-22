@@ -89,6 +89,7 @@ try {
     Launch
 }
 catch {
+    Write-Host
     Write-Host "An error has occured" -ForegroundColor White -BackgroundColor Red -NoNewline
     Write-Host " $($_.Exception.Message)"
 

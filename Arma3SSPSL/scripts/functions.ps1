@@ -342,12 +342,18 @@ function Read-ExitAction()
     $done = $false
 
     do {
-        Write-Host "Press [Enter] to exit or [R] to open RPT file: " -NoNewline
+        Write-Host "Press [Enter] to exit, [R] to open RPT file or [P] to print matching lines: " -NoNewline
         $input = [console]::ReadKey()
     
         if ($input.Key -eq 'R')
         {
             Open-LatestRptFile
+            $done = $true
+        }
+
+        if ($input.Key -eq 'P')
+        {
+            Out-LatestRptFile
             $done = $true
         }
 
@@ -420,13 +426,58 @@ function Get-SymlinkTarget()
     return $targetPath
 }
 
+function Get-LatestRpt()
+{
+    $latestRpt = $null
+
+    try 
+    {
+        $latestRpt = Get-ChildItem $profilesPath -Filter "*.rpt" `
+                    | Sort-Object LastWriteTime -Descending `
+                    | Select-Object -First 1
+    }
+    catch { }
+
+    return $latestRpt
+}
+
 function Open-LatestRptFile()
 {
-    $latestRptFile = Get-ChildItem $profilesPath -Filter "*.rpt" `
-                        | Sort-Object LastWriteTime -Descending `
-                        | Select-Object -First 1
+    $rpt = Get-LatestRpt
 
-    Write-Host "Opening $($latestRptFile.FullName)"
-
-    Invoke-Item $($latestRptFile.FullName)
+    if ($rpt)
+    {
+        Write-Host "Opening $($rpt.FullName)"
+        Invoke-Item $($rpt.FullName)
+    }
+    else 
+    {
+        throw "No RPT files found."
+    }
 }
+
+function Out-LatestRptFile()
+{
+    $rpt = Get-LatestRpt
+
+    if ($rpt)
+    {
+        Write-Host
+        Write-Host "Pattern [Every line]: " -NoNewLine
+        $pattern = Read-Host
+
+        if ([string]::IsNullOrWhiteSpace($pattern))
+        {
+            $pattern = '(.*?)' # Match everything
+        }
+
+        Write-Host
+        Write-Host "Printing RPT $($rpt.FullName)" -BackgroundColor DarkGray
+        Get-Content $rpt.FullName -Wait | Select-String -Pattern $Pattern | Write-Host
+    }
+    else 
+    {
+        throw "No RPT files found."
+    }
+}
+
