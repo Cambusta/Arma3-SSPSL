@@ -67,12 +67,13 @@ function Launch()
     $mods = Read-PresetFile $($preset.Path)
     $modParameter = Initialize-GlobalModParameter -ModNames $mods.global
     $serverModParameter = Initialize-ServerModParameter -ModNames $mods.server
+    Write-OptionalMods -ModNames $mods.optional
     
     if ($NoKeyCopying -ne $true)
     {
         Write-Host
         Clear-KeysFolder
-        Copy-Keys -ModNames $($mods.global + $mods.server)
+        Copy-Keys -ModNames $($mods.global + $mods.server + $mods.optional)
     }
     
     Write-Host

@@ -163,11 +163,14 @@ function Read-PresetFile()
         $PresetFilePath
     )
 
+    $special = @('#', '$', '*')
+
     $skipped = 0
 
     $mods = @{
         global = @()
         server = @()
+        optional = @()
     }
 
     $content = Get-Content -Path $PresetFilePath
@@ -180,17 +183,29 @@ function Read-PresetFile()
         }
 
         $line = $line.Trim()
+        $firstChar = $line[0]
 
-        if ($line[0] -eq '#')
-        {
-            $skipped++
-            continue
-        }
-
-        if ($line[0] -eq '$')
+        if ($special -contains $firstChar)
         {
             $name = $line.substring(1).Trim()
-            $mods.server += $name
+
+            if ($firstChar -eq '#')
+            {
+                $skipped++
+                continue
+            }
+    
+            if ($firstChar -eq '$')
+            {
+                $mods.server += $name
+                continue
+            }
+    
+            if ($firstChar -eq '*')
+            {
+                $mods.optional += $name
+                continue
+            }
         }
         else
         {
@@ -198,7 +213,7 @@ function Read-PresetFile()
         }
     }
 
-    Write-Host "Read $($mods.global.Count) global mods, $($mods.server.Count) server mods, $skipped skipped."
+    Write-Host "Read $($mods.global.Count) global, $($mods.server.Count) server, $($mods.optional.Count) optional mods, $skipped skipped."
 
     return $mods
 }
@@ -233,6 +248,22 @@ function Initialize-ServerModParameter()
     }
 
     return $null
+}
+
+function Write-OptionalMods()
+{
+    param(
+        [Parameter(Mandatory=$true)]
+        $ModNames
+    )
+
+    if ($ModNames)
+    {
+        foreach ($mod in $ModNames) 
+        {
+            Write-Host "$mod (optional)" -ForegroundColor DarkGray    
+        }   
+    }
 }
 
 function Clear-KeysFolder()
@@ -480,4 +511,3 @@ function Out-LatestRptFile()
         throw "No RPT files found."
     }
 }
-
