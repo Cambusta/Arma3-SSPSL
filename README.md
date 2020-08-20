@@ -17,6 +17,7 @@ The basic configuration requires updating several values in the following config
 1. `Arma3RootPath` should point to the directory in which Arma 3 is installed. Backslashes in the path must be doubled (e.g. 'C:\\\\Games\\\\Arma')
 2. `ServerExeName` should contain the name of the server executable (e.g. 'arma3server_x64.exe')
 3. `Port` should contain the port number which will be used by the server (default `2302` value will work most of the time)
+4. (optional) `Webhook` section contains [Discord webhook](https://support.discord.com/hc/en-us/articles/228383668-Intro-to-Webhooks)'s `Id` and `Token`. This will be used to post Arma server address, port and list of mods to the Discord channel to which webhook is attached to. `Enabled` parameter determines if the webhook gets executed. 
 
 ### .\config\server.cfg
 See [server.cfg description](https://community.bistudio.com/wiki/server.cfg) for details.
@@ -38,7 +39,10 @@ Simply run `start.cmd` file.
 Alternatively, if you want to make use of `-PresetName` and `-NoKeyCopying` parameters, run `.\scripts\launch.ps1` file.
 
 ## Presets
-Presets are simple text files placed into `.\presets\` folder. Presets contain names of the mods from Arma 3's `!Workshop` folder, without the `@` sign. Only one mod per line is allowed, empty lines are ignored. Use `$` at the beginning of a line to indicate that a mod is server-side and `#` for comments or disabling mods.
+Presets are simple text files placed into `.\presets\` folder. Presets contain names of the mods from Arma 3's `!Workshop` folder, without the `@` sign. Only one mod per line is allowed, empty lines are ignored. 
+* Use `$` at the beginning of a line to indicate that a mod is server-side.
+* Use `*` at the beginning of a line to indicate that a mod is optional.
+* Use `#` for comments or disabling mods.
 
 See `.\presets\CUP.txt` for an example of a preset.
 
