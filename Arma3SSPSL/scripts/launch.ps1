@@ -39,6 +39,7 @@ function Launch()
     $a3RootPath = $launcherParameters.Arma3RootPath
     $serverExeName = $launcherParameters.ServerExeName
     $port = $launcherParameters.Port
+    $webhook = $launcherParameters.Webhook
 
     if (!(Confirm-ServerNotRunning))
     {
@@ -78,6 +79,12 @@ function Launch()
     
     Write-Host
     Start-Server -ModParameter $modParameter -ServerModParameter $serverModParameter
+
+    if ($webhook.Enabled)
+    {
+        $content = Initialize-WebhookContent $mods.global $mods.optional $port
+        Invoke-Webhook $content $webhook
+    }
 
     Read-ExitAction
 

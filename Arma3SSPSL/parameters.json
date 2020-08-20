@@ -1,5 +1,11 @@
 {
     "Arma3RootPath" : "D:\\SteamLibrary\\steamapps\\common\\Arma 3\\",
     "ServerExeName" : "arma3server_x64.exe",
-    "Port" : 2302
+    "Port" : 2302,
+    "Webhook" : 
+    {
+        "Enabled" : false,
+        "Id" : "0",
+        "Token" : "0"
+    }
 }

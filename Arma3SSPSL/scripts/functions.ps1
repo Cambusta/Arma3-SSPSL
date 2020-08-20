@@ -30,6 +30,19 @@ function Read-LauncherParametersFile {
         throw "Launcher parameters: Port value not set or invalid."
     }
 
+    if ($parameters.Webhook -and $parameters.Webhook.Enabled)
+    {
+        if (!($parameters.Webhook.Id))
+        {
+            throw "Launcher parameters: Webhook Id value not set or invalid."
+        }
+
+        if (!($parameters.Webhook.Token))
+        {
+            throw "Launcher parameters: Webhook Token value not set or invalid."
+        }
+    }
+
     return $parameters
 }
 
@@ -368,6 +381,37 @@ function Start-Server()
     Write-Host
 }
 
+function Invoke-Webhook
+{
+    param(
+        [Parameter(Mandatory=$true)]
+        $content,
+
+        [Parameter(Mandatory=$true)]
+        $webhook
+    )
+
+    Write-Host "Executing webhook..." -NoNewline
+
+    $uri = "https://discord.com/api/webhooks/$($webhook.Id)/$($webhook.Token)"
+    $headers = @{ 'Content-Type' = 'application/json' }
+    $body = ConvertTo-Json @{ content = $content }
+
+    $StatusCode = 0
+
+    try
+    {
+        $Response = Invoke-WebRequest -Uri $uri -Headers $headers -Body $body -Method POST
+        $StatusCode = $Response.StatusCode
+    }
+    catch
+    {
+        $StatusCode = $_.Exception.Response.StatusCode.value__
+    }
+
+    Write-Host $StatusCode
+}
+
 function Read-ExitAction()
 {
     $done = $false
@@ -510,4 +554,62 @@ function Out-LatestRptFile()
     {
         throw "No RPT files found."
     }
+}
+
+function Initialize-WebhookContent()
+{
+    param(
+        [Parameter(Mandatory=$true)]
+        $GlobalMods,
+
+        [Parameter(Mandatory=$true)]
+        $OptionalMods,
+
+        [Parameter(Mandatory=$true)]
+        $Port
+    )
+
+    $ip = Get-ExternalIP        
+    $sb = [System.Text.StringBuilder]::new()
+    
+    [void] $sb.AppendLine(":hatching_chick: **Arma 3 Server at ${ip}, port ${port}.**")
+    [void] $sb.AppendLine()
+
+    if ($GlobalMods)
+    {
+        [void] $sb.AppendLine("__Required mods__:")
+        foreach($mod in $globalMods)
+        {
+            [void] $sb.AppendLine($mod)
+        }
+    }
+
+    if ($OptionalMods)
+    {
+        [void] $sb.AppendLine()
+        [void] $sb.AppendLine("__Optional mods__:")
+        foreach($mod in $optionalMods)
+        {
+            [void] $sb.AppendLine($mod)
+        }
+    }
+
+    if (!($GlobalMods) -and !($OptionalMods))
+    {
+        [void] $sb.AppendLine("Vanilla game.")
+    }
+
+    return $sb.ToString();
+}
+
+function Get-ExternalIP {
+
+    $ip = "0.0.0.0"
+
+    try {
+        $ip = (Invoke-WebRequest -UseBasicParsing ifconfig.me/ip).Content.Trim()
+    }
+    catch {}
+
+    return $ip     
 }
