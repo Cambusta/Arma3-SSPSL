@@ -48,7 +48,7 @@ function Launch()
 
     Write-Host
     Write-Host "Reading presets..."
-    
+
     Write-Host
     $presets = Get-PresetFiles
 
@@ -63,7 +63,10 @@ function Launch()
         Write-Host
         $preset = Select-PresetByIndex $presets
     }
-    
+
+    Write-Host
+    $executeWebhook = Read-WebhookExecution $webhook.Enabled
+
     Write-Host
     $mods = Read-PresetFile $($preset.Path)
     $modParameter = Initialize-GlobalModParameter -ModNames $mods.global
@@ -76,15 +79,15 @@ function Launch()
         Clear-KeysFolder
         Copy-Keys -ModNames $($mods.global + $mods.server + $mods.optional)
     }
-    
-    Write-Host
-    Start-Server -ModParameter $modParameter -ServerModParameter $serverModParameter
 
-    if ($webhook.Enabled)
+    if ($executeWebhook)
     {
         $content = Initialize-WebhookContent $mods.global $mods.optional $port
         Invoke-Webhook $content $webhook
     }
+
+    Write-Host
+    Start-Server -ModParameter $modParameter -ServerModParameter $serverModParameter
 
     Read-ExitAction
 

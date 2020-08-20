@@ -418,21 +418,21 @@ function Read-ExitAction()
 
     do {
         Write-Host "Press [Enter] to exit, [R] to open RPT file or [P] to print matching lines: " -NoNewline
-        $input = [console]::ReadKey()
+        $response = [console]::ReadKey()
     
-        if ($input.Key -eq 'R')
+        if ($response.Key -eq 'R')
         {
             Open-LatestRptFile
             $done = $true
         }
 
-        if ($input.Key -eq 'P')
+        if ($response.Key -eq 'P')
         {
             Out-LatestRptFile
             $done = $true
         }
 
-        if ($input.Key -eq "Enter")
+        if ($response.Key -eq "Enter")
         {
             $done = $true
         }
@@ -556,6 +556,37 @@ function Out-LatestRptFile()
     }
 }
 
+function Read-WebhookExecution()
+{
+    param(
+        [Parameter(Mandatory=$true)]
+        $webhookEnabled
+    )
+
+    $executeWebhook = $false
+
+    if ($webhookEnabled)
+    {
+        $done = $false
+
+        do {
+            $response = (Read-Host -Prompt  "Execute webhook (Y/n)").ToLower()
+            
+            if ($response -in 'y','n','')
+            {
+                $done = $true
+
+                if ($response.ToLower() -ne 'n')
+                {
+                    $executeWebhook = $true
+                }
+            }
+        } until ($done)
+    }
+
+    return $executeWebhook
+}
+
 function Initialize-WebhookContent()
 {
     param(
@@ -569,10 +600,10 @@ function Initialize-WebhookContent()
         $Port
     )
 
-    $ip = Get-ExternalIP        
+    $ip = Get-ExternalIP
     $sb = [System.Text.StringBuilder]::new()
-    
-    [void] $sb.AppendLine(":hatching_chick: **Arma 3 Server at ${ip}, port ${port}.**")
+
+    [void] $sb.AppendLine("**Arma 3 Server at ${ip}, port ${port}.**")
     [void] $sb.AppendLine()
 
     if ($GlobalMods)
@@ -611,5 +642,5 @@ function Get-ExternalIP {
     }
     catch {}
 
-    return $ip     
+    return $ip
 }
