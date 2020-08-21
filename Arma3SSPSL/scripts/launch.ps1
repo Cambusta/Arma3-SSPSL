@@ -40,6 +40,7 @@ function Launch()
     $serverExeName = $launcherParameters.ServerExeName
     $port = $launcherParameters.Port
     $webhook = $launcherParameters.Webhook
+    $executeWebhook = $webhook.Enabled
 
     if (!(Confirm-ServerNotRunning))
     {
@@ -62,10 +63,10 @@ function Launch()
 
         Write-Host
         $preset = Select-PresetByIndex $presets
-    }
 
-    Write-Host
-    $executeWebhook = Read-WebhookExecution $webhook.Enabled
+        Write-Host
+        $executeWebhook = Read-WebhookExecution $webhook.Enabled
+    }
 
     Write-Host
     $mods = Read-PresetFile $($preset.Path)

@@ -36,7 +36,7 @@ Simply run `start.cmd` file.
 >
 > Run the `start.cmd` again.
 
-Alternatively, if you want to make use of `-PresetName` and `-NoKeyCopying` parameters, run `.\scripts\launch.ps1` file.
+Alternatively, if you want to make use of `-PresetName` and `-NoKeyCopying` parameters, run `.\scripts\launch.ps1` file. Note that `-PresetName` parameter requires file name with extension.
 
 ## Presets
 Presets are simple text files placed into `.\presets\` folder. Presets contain names of the mods from Arma 3's `!Workshop` folder, without the `@` sign. Only one mod per line is allowed, empty lines are ignored. 
