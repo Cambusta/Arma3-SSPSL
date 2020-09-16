@@ -321,22 +321,25 @@ function Copy-Keys()
 
         if (Test-Path $absolutePath)
         {
-            $bikey = Get-ChildItem -Path $absolutePath -Filter "*.bikey" -Recurse
+            $keys = Get-ChildItem -Path $absolutePath -Filter "*.bikey" -Recurse
 
-            if($bikey)
+            if($keys)
             {
-                $name = $bikey.Name
-                $destinationHasKey = Get-ChildItem -Path $keysPath -Filter $bikey.Name -Recurse
-
-                if ($destinationHasKey)
+                foreach($bikey in $keys)
                 {
-                    $name = $bikey.BaseName + "_$duplicateId" + $bikey.Extension
-                    $duplicateId++
+                    $name = $bikey.Name
+                    $destinationHasKey = Get-ChildItem -Path $keysPath -Filter $bikey.Name -Recurse
+
+                    if ($destinationHasKey)
+                    {
+                        $name = $bikey.BaseName + "_$duplicateId" + $bikey.Extension
+                        $duplicateId++
+                    }
+
+                    $destination = Join-Path $keysPath $name
+
+                    Copy-Item -Path $bikey.FullName -Destination $destination | Out-Null
                 }
-
-                $destination = Join-Path $keysPath $name
-
-                Copy-Item -Path $bikey.FullName -Destination $destination | Out-Null
             }
             else 
             {
