@@ -21,7 +21,7 @@ $presetsFolder = "..\presets\"
 $serverConfigPath = "..\config\server.cfg"
 $basicConfigPath = "..\config\basic.cfg"
 $profileName = "serverProfile"
-$profilesPath = "..\profiles\"
+$profilesPath = "..\profiles"
 
 # Arma 3 Server process names
 $arma3server64ProcessName = "arma3server_x64"

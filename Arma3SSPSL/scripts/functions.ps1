@@ -158,7 +158,7 @@ function Select-PresetByIndex()
         }
         catch
         {
-            Write-Host "Invalid input." -ForegroundColor Red
+            Write-Host "Invalid input. Please provide preset index (1,2,3...)." -ForegroundColor Red
         }
     } while ($validIndex -ne $true)
 
