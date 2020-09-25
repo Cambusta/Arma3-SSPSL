@@ -241,7 +241,7 @@ function Initialize-GlobalModParameter()
     if ($ModNames)
     {
         $modPaths = Initialize-ModList $ModNames
-        return "-mod=$modPaths"
+        return '"-mod=' + $modPaths + '"';
     }
 
     return $null
@@ -257,7 +257,7 @@ function Initialize-ServerModParameter()
     if ($ModNames)
     {
         $modPaths = Initialize-ModList $ModNames -ServerMods
-        return "-servermod=$modPaths"
+        return '"-servermod=' + $modPaths + '"';
     }
 
     return $null
@@ -455,7 +455,7 @@ function Initialize-ModList
         $ServerMods
     )
 
-    $modlist = '"'
+    $modlist = "";
 
     foreach($mod in $ModNames)
     {
@@ -481,8 +481,6 @@ function Initialize-ModList
             Write-Host "[Invalid mod path]: $mod expected folder at $relativePath but none found. Skipping." -ForegroundColor Yellow
         }
     }
-
-    $modlist = $modlist + '"'
 
     return $modlist
 }
