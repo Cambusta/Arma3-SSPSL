@@ -166,6 +166,7 @@ function Select-PresetByIndex()
 
     Write-Host
     Write-Host "Selected $($selectedPreset.Name)" -ForegroundColor Green
+
     return $selectedPreset
 }
 
@@ -460,10 +461,10 @@ function Initialize-ModList
     foreach($mod in $ModNames)
     {
         $relativePath = "!Workshop\@$mod"
+        $absolutePath = Join-Path $a3RootPath $relativePath
 
-        if (Test-Path (Join-Path $a3RootPath $relativePath))
+        if (Test-Path $absolutePath)
         {
-
             if ($ServerMods)
             {
                 Write-Host "$mod (server-side)" -ForegroundColor DarkGreen
@@ -473,8 +474,7 @@ function Initialize-ModList
                 Write-Host "$mod" -ForegroundColor Green
             }
 
-            $modPath = Get-SymlinkTarget -SymlinkPath $relativePath
-            $modlist = $modlist + "$modPath;"
+            $modlist = $modlist + "$absolutePath;"
         }
         else 
         {
@@ -483,23 +483,6 @@ function Initialize-ModList
     }
 
     return $modlist
-}
-
-function Get-SymlinkTarget()
-{
-    param(
-        [Parameter(Mandatory=$true)]
-        $SymlinkPath
-    )
-
-    $targetPath = Get-Item (Join-Path $a3RootPath $SymlinkPath) | Select-Object -ExpandProperty Target
-
-    if (!(Test-Path $targetPath))
-    {
-        throw "Error while expanding symlink '$SymlinkPath': target path '$targetPath' doesn't exist."
-    }
-
-    return $targetPath
 }
 
 function Get-LatestRpt()
