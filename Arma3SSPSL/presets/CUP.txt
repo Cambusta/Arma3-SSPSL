@@ -8,4 +8,5 @@ CUP Vehicles
 CUP Weapons
 
 $ dzn Vehicle On Fire
+* CUP Terrains - CWA
 # RHSAFRF

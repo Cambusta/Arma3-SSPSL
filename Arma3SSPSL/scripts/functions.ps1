@@ -264,7 +264,7 @@ function Initialize-ServerModParameter()
     return $null
 }
 
-function Write-OptionalMods()
+function Show-OptionalMods()
 {
     param(
         [Parameter(Mandatory=$true)]
@@ -275,8 +275,8 @@ function Write-OptionalMods()
     {
         foreach ($mod in $ModNames) 
         {
-            Write-Host "$mod (optional)" -ForegroundColor DarkGray    
-        }   
+            Write-Host "$mod (optional)" -ForegroundColor DarkGray
+        }
     }
 }
 
@@ -350,41 +350,6 @@ function Copy-Keys()
     }
 }
 
-function Start-Server()
-{
-    param(
-        $ModParameter,
-        $ServerModParameter
-    )
-
-    $serverNameParameter = "-name=$profileName"
-    $portParameter = "-port=$port"
-
-    $serverExePath = Join-Path $a3RootPath $serverExeName
-    $serverConfigParameter = '"-config=' + $(Resolve-Path $serverConfigPath) + '"'
-    $basicConfigParameter = '"-cfg=' + $(Resolve-Path $basicConfigPath) +'"'
-    $profilesParameter = '"-profiles=' + $(Resolve-Path $profilesPath) + '"'
-
-    Write-Host "Starting server at $port..."
-
-    $argumentList = @($serverNameParameter, $portParameter, $basicConfigParameter, $serverConfigParameter, $profilesParameter)
-
-    if ($ModParameter)
-    {
-        $argumentList += $ModParameter
-    }
-
-    if ($ServerModParameter)
-    {
-        $argumentList += $ServerModParameter
-    }
-
-    Start-Process -FilePath $serverExePath -ArgumentList $argumentList
-
-    Write-Host "Server started." -ForegroundColor Black -BackgroundColor Green
-    Write-Host
-}
-
 function Invoke-Webhook
 {
     param(
@@ -414,6 +379,42 @@ function Invoke-Webhook
     }
 
     Write-Host $StatusCode
+}
+
+function Start-Server()
+{
+    param(
+        $ModParameter,
+        $ServerModParameter
+    )
+
+    $serverNameParameter = "-name=$profileName"
+    $portParameter = "-port=$port"
+
+    $serverExePath = Join-Path $a3RootPath $serverExeName
+    $serverConfigParameter = '"-config=' + $(Resolve-Path $serverConfigPath) + '"'
+    $basicConfigParameter = '"-cfg=' + $(Resolve-Path $basicConfigPath) +'"'
+    $profilesParameter = '"-profiles=' + $(Resolve-Path $profilesPath) + '"'
+
+    Write-Host "Starting server..."
+
+    $argumentList = @($serverNameParameter, $portParameter, $basicConfigParameter, $serverConfigParameter, $profilesParameter)
+
+    if ($ModParameter)
+    {
+        $argumentList += $ModParameter
+    }
+
+    if ($ServerModParameter)
+    {
+        $argumentList += $ServerModParameter
+    }
+
+    Start-Process -FilePath $serverExePath -ArgumentList $argumentList
+
+    Write-Host "Server started at " -ForegroundColor Black -BackgroundColor Green -NoNewline
+    Write-Host "$(Get-ExternalIP):$port" -ForegroundColor Black -BackgroundColor Green
+    Write-Host
 }
 
 function Read-ExitAction()
@@ -542,31 +543,23 @@ function Out-LatestRptFile()
 
 function Read-WebhookExecution()
 {
-    param(
-        [Parameter(Mandatory=$true)]
-        $webhookEnabled
-    )
-
     $executeWebhook = $false
 
-    if ($webhookEnabled)
-    {
-        $done = $false
+    $done = $false
 
-        do {
-            $response = (Read-Host -Prompt  "Execute webhook (Y/n)").ToLower()
-            
-            if ($response -in 'y','n','')
+    do {
+        $response = (Read-Host -Prompt  "Execute webhook (Y/n)").ToLower()
+
+        if ($response -in 'y','n','')
+        {
+            $done = $true
+
+            if ($response.ToLower() -ne 'n')
             {
-                $done = $true
-
-                if ($response.ToLower() -ne 'n')
-                {
-                    $executeWebhook = $true
-                }
+                $executeWebhook = $true
             }
-        } until ($done)
-    }
+        }
+    } until ($done)
 
     return $executeWebhook
 }

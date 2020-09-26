@@ -49,8 +49,8 @@ function Launch()
 
     Write-Host
     Write-Host "Reading presets..."
-
     Write-Host
+
     $presets = Get-PresetFiles
 
     if ($PresetFileName)
@@ -60,23 +60,26 @@ function Launch()
     else
     {
         Write-PresetList $presets
-
         Write-Host
+
         $preset = Select-PresetByIndex $presets
-
         Write-Host
-        $executeWebhook = Read-WebhookExecution $webhook.Enabled
+
+        if ($webhook.Enabled)
+        {
+            $executeWebhook = Read-WebhookExecution
+            Write-Host
+        }
     }
 
-    Write-Host
     $mods = Read-PresetFile $($preset.Path)
     $modParameter = Initialize-GlobalModParameter -ModNames $mods.global
     $serverModParameter = Initialize-ServerModParameter -ModNames $mods.server
-    Write-OptionalMods -ModNames $mods.optional
-    
+    Show-OptionalMods -ModNames $mods.optional
+    Write-Host
+
     if ($NoKeyCopying -ne $true)
     {
-        Write-Host
         Clear-KeysFolder
         Copy-Keys -ModNames $($mods.global + $mods.server + $mods.optional)
     }
@@ -88,11 +91,12 @@ function Launch()
     }
 
     Write-Host
+
     Start-Server -ModParameter $modParameter -ServerModParameter $serverModParameter
 
     Read-ExitAction
-
     Write-Host
+
     Write-Host "Exiting." -ForegroundColor Black -BackgroundColor DarkGray
     exit
 }
