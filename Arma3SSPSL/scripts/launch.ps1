@@ -27,6 +27,26 @@ $profilesPath = "..\profiles"
 $arma3server64ProcessName = "arma3server_x64"
 $arma3serverProcessName = "arma3server"
 
+# Creator DLCs name and path resolution table
+$CDLCs = @{
+    gm = @{
+        Name = "Global Mobilization";
+        Path = "GM";
+    }
+    vn = @{
+        Name = "S.O.G. Paire Fire";
+        Path = "vn"
+    }
+    cslr= @{
+        Name = "CSLA Iron Curtain";
+        Path = "CSLA"
+    } 
+    ws = @{
+        Name = "Western Sahara";
+        Path = "WS"
+    } 
+}
+
 # Include utility functions
 . '.\functions.ps1'
 

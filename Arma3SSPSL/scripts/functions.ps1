@@ -317,9 +317,25 @@ function Copy-Keys()
 
     foreach($mod in $ModNames)
     {
-        $relativePath = "!Workshop\@$mod"
-        $absolutePath = (Join-Path $a3RootPath $relativePath)
 
+        if ($mod -notin $CDLCs.Keys)
+        {
+            $relativePath = "!Workshop\@$mod"
+
+        }
+        else 
+        {
+            if ($mod -eq "gm")
+            {
+                # Global Mobilization doesn't have keys
+                continue
+            }
+
+            $relativePath = $CDLCs[$mod].Path
+        }
+        
+        $absolutePath = (Join-Path $a3RootPath $relativePath)
+        
         if (Test-Path $absolutePath)
         {
             $keys = Get-ChildItem -Path $absolutePath -Filter "*.bikey" -Recurse
@@ -461,6 +477,24 @@ function Initialize-ModList
 
     foreach($mod in $ModNames)
     {
+        if ($mod -in $CDLCs.Keys)
+        {
+            $relativePath = $CDLCs[$mod].Path
+            $absolutePath = Join-Path $a3RootPath $relativePath
+
+            if (Test-Path $absolutePath)
+            {
+                Write-Host "$($CDLCs[$mod].Name) (CDLC)" -ForegroundColor DarkMagenta
+                $modlist = $modlist + "$mod;"
+            }
+            else 
+            {
+                Write-Host "[CLDC not installed]: $($CDLCs[$mod].Name)'s folder not found at $absolutePath. Skipping." -ForegroundColor Yellow                
+            }
+
+            continue
+        }
+
         $relativePath = "!Workshop\@$mod"
         $absolutePath = Join-Path $a3RootPath $relativePath
 
@@ -588,7 +622,14 @@ function Initialize-WebhookContent()
         [void] $sb.AppendLine("__Required mods__:")
         foreach($mod in $globalMods)
         {
-            [void] $sb.AppendLine($mod)
+            if ($mod -notin $CDLCs.Keys)
+            {
+                [void] $sb.AppendLine($mod)
+            }
+            else 
+            {
+                [void] $sb.AppendLine("$($CDLCs[$mod].Name) (CDLC)")
+            }
         }
     }
 
