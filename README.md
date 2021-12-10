@@ -36,6 +36,13 @@ Presets are simple text files placed into [`\presets\`](https://github.com/Cambu
 * Use `*` at the beginning of a line to indicate that a mod is optional.
 * Use `#` for comments or disabling mods.
 
+### Creator DLCs
+To enable a CDLC simply add its directory name to your preset file, just as you would add a regular mod. The CDLC must be installed for it to be enabled. Following CDLCs are supported:
+1. `gm` - Global Mobilization
+2. `vn` - S.O.G. Paire Fire
+3. `ws` - Western Sahara
+4. `cslr` - CLSA Iron Curtain
+
 See [`\presets\CUP.txt`](https://github.com/Cambusta/Arma3-SSPSL/blob/master/Arma3SSPSL/presets/CUP.txt) for an example of a preset.
 
 ## Launching the server

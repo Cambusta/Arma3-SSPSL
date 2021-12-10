@@ -34,7 +34,7 @@ $CDLCs = @{
         Path = "GM";
     }
     vn = @{
-        Name = "S.O.G. Paire Fire";
+        Name = "S.O.G. Praire Fire";
         Path = "vn"
     }
     cslr= @{
