@@ -336,16 +336,16 @@ function Copy-Keys()
         
         $absolutePath = (Join-Path $a3RootPath $relativePath)
         
-        if (Test-Path $absolutePath)
+        if (Test-Path -LiteralPath $absolutePath)
         {
-            $keys = Get-ChildItem -Path $absolutePath -Filter "*.bikey" -Recurse
+            $keys = Get-ChildItem -LiteralPath $absolutePath -Filter "*.bikey" -Recurse 
 
             if($keys)
             {
                 foreach($bikey in $keys)
                 {
                     $name = $bikey.Name
-                    $destinationHasKey = Get-ChildItem -Path $keysPath -Filter $bikey.Name -Recurse
+                    $destinationHasKey = Get-ChildItem -LiteralPath $keysPath -Filter $bikey.Name -Recurse 
 
                     if ($destinationHasKey)
                     {
@@ -355,13 +355,17 @@ function Copy-Keys()
 
                     $destination = Join-Path $keysPath $name
 
-                    Copy-Item -Path $bikey.FullName -Destination $destination | Out-Null
+                    Copy-Item -LiteralPath $bikey.FullName -Destination $destination | Out-Null
                 }
             }
             else 
             {
                 Write-Host "[Invalid bikey path]: unable to find .bikey file for $mod."
             }
+        }
+        else 
+        {
+            Write-Host "[Invalid mod path]: $mod expected folder at $relativePath but none found. Skipping key copying." -ForegroundColor Yellow
         }
     }
 }
