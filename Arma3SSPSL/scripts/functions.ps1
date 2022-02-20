@@ -498,7 +498,7 @@ function Initialize-ModList
         $relativePath = "!Workshop\@$mod"
         $absolutePath = Join-Path $a3RootPath $relativePath
 
-        if (Test-Path $absolutePath)
+        if (Test-Path -LiteralPath $absolutePath)
         {
             if ($ServerMods)
             {
